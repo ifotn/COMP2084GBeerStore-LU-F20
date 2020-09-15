@@ -1,0 +1,24 @@
+﻿@model IEnumerable<COMP2084BeerStore.Models.Category>
+
+<h1>Welcome to the COMP2084 Beer Store</h1>
+
+<ul>
+    @foreach (var c in Model)
+    {
+        <li>
+            <a asp-controller="Store" asp-action="Browse" asp-route-category="@c.Name">@c.Name</a>
+        </li>
+    }
+</ul>
+
+@*<ul>
+    <li>
+        <a asp-controller="Store" asp-action="Browse" asp-route-category="Stout">Stout</a>
+    </li>
+    <li>
+        <a asp-controller="Store" asp-action="Browse" asp-route-category="IPA">IPA</a>
+    </li>
+    <li>
+        <a asp-controller="Store" asp-action="Browse" asp-route-category="Wheat">Wheat</a>
+    </li>
+</ul>*@
