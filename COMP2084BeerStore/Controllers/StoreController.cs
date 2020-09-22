@@ -30,5 +30,12 @@ namespace COMP2084BeerStore.Controllers
             ViewBag.category = category;
             return View();
         }
+
+        // /Store/AddCategory
+        public IActionResult AddCategory()
+        {
+            // load a form to capture a new category object from the user
+            return View();
+        }
     }
 }
