@@ -12,5 +12,8 @@ namespace COMP2084BeerStore.Models
 
         [Required]
         public string Name { get; set; }
+
+        // child object reference
+        public List<Product> Products { get; set; }
     }
 }
