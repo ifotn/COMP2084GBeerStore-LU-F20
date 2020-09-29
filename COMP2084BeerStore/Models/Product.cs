@@ -27,5 +27,6 @@ namespace COMP2084BeerStore.Models
 
         // child ref
         public List<OrderDetail> OrderDetails { get; set; }
+        public List<Cart> Carts { get; set; }
     }
 }
