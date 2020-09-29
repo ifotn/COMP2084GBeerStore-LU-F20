@@ -21,6 +21,7 @@ namespace COMP2084BeerStore.Models
         public float AlcoholContent { get; set; }
         [Required]
         public int Volume { get; set; }
+        public string Photo { get; set; }
 
         // parent object reference
         public Category Category { get; set; }
