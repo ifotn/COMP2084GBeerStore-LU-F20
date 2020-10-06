@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using COMP2084BeerStore.Data;
 using COMP2084BeerStore.Models;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace COMP2084BeerStore.Controllers
 {
@@ -57,10 +59,32 @@ namespace COMP2084BeerStore.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,SKU,CategoryId,ProductName,Price,AlcoholContent,Volume,Photo")] Product product)
+        public async Task<IActionResult> Create([Bind("Id,SKU,CategoryId,ProductName,Price,AlcoholContent,Volume")] Product product, IFormFile Photo)
         {
             if (ModelState.IsValid)
             {
+                // process photo upload if any
+                if (Photo.Length > 0)
+                {
+                    // get temp file path
+                    var filePath = Path.GetTempFileName();
+
+                    // make a unique file name so nothing is overwritten
+                    var fileName = Guid.NewGuid() + "-" + Photo.FileName;
+
+                    // set destination path 
+                    var uploadPath = System.IO.Directory.GetCurrentDirectory() + "\\wwwroot\\img\\product-uploads\\" + fileName;
+
+                    // copy the file
+                    using (var stream = new FileStream(uploadPath, FileMode.Create))
+                    {
+                        await Photo.CopyToAsync(stream);
+                    }
+
+                    // set the unique name to save to the db
+                    product.Photo = fileName;
+                }
+
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
