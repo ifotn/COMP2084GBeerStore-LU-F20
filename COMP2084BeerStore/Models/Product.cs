@@ -13,13 +13,23 @@ namespace COMP2084BeerStore.Models
         public string SKU { get; set; }
         [Required]
         public int CategoryId { get; set; }
+
         [Required]
+        [Display(Name = "Name")]
         public string ProductName { get; set; }
+
         [Required]
+        [DisplayFormat(DataFormatString = "{0:c}")] // display in currency format
+        [Range(0.01, 999999)]
         public double Price { get; set; }
+
         [Required]
+        [Display(Name = "Alcohol %")]
+        [Range(0, 100)]
         public float AlcoholContent { get; set; }
+
         [Required]
+        [Range(1, 999999)]
         public int Volume { get; set; }
         public string Photo { get; set; }
 

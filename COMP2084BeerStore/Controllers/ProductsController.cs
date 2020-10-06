@@ -24,7 +24,7 @@ namespace COMP2084BeerStore.Controllers
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Products.Include(p => p.Category);
+            var applicationDbContext = _context.Products.Include(p => p.Category).OrderBy(p => p.ProductName);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -50,7 +50,7 @@ namespace COMP2084BeerStore.Controllers
         // GET: Products/Create
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
+            ViewData["CategoryId"] = new SelectList(_context.Categories.OrderBy(c => c.Name), "Id", "Name");
             return View();
         }
 
