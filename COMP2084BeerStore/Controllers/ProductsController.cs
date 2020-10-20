@@ -9,9 +9,11 @@ using COMP2084BeerStore.Data;
 using COMP2084BeerStore.Models;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace COMP2084BeerStore.Controllers
 {
+    [Authorize]
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _context;
