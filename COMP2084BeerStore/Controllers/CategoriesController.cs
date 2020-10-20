@@ -11,8 +11,8 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace COMP2084BeerStore.Controllers
 {
-    // make the entire controller available to authenticated users only
-    [Authorize]
+    // make the entire controller available to Administrator users only
+    [Authorize(Roles = "Administrator")]
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;

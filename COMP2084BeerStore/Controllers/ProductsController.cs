@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace COMP2084BeerStore.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrator")]
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _context;
