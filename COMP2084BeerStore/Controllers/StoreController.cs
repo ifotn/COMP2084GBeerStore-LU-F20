@@ -37,11 +37,15 @@ namespace COMP2084BeerStore.Controllers
             return View(categories);
         }
 
-        // /Store/Browse
-        public IActionResult Browse(string category)
+        // /Store/Browse/6
+        public IActionResult Browse(int id)
         {
-            ViewBag.category = category;
-            return View();
+            // query Products for the selected Category
+            var products = _context.Products.Where(p => p.CategoryId == id).OrderBy(p => p.ProductName).ToList();
+
+            // get Name of selected Category.  Find() only filters on key fields
+            ViewBag.category = _context.Categories.Find(id).Name.ToString();
+            return View(products);
         }
 
         // /Store/AddCategory

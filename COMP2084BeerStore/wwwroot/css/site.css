@@ -74,3 +74,7 @@ body {
 .navbar-light {
     background-color: #BBDEFB;
 }
+
+.thumb, .input-small {
+    width: 70px;
+}
