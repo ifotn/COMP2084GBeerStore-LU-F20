@@ -42,6 +42,9 @@ namespace COMP2084BeerStore
                     options.ClientSecret = Configuration.GetSection("Authentication:Google")["ClientSecret"];
                 });
 
+            // enable Session support to store user identities for the shopping cart
+            services.AddSession();
+
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
@@ -67,6 +70,9 @@ namespace COMP2084BeerStore
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            // enable session support to store user identities when shopping BEFORE url mapping
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {

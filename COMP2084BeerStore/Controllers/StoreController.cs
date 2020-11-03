@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using COMP2084BeerStore.Data;
 using COMP2084BeerStore.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace COMP2084BeerStore.Controllers
@@ -65,6 +66,9 @@ namespace COMP2084BeerStore.Controllers
             // get current Date & Time using built in .net function
             var currentDateTime = DateTime.Now;
 
+            // CustomerId variable
+            var CustomerId = GetCustomerId();
+
             // create and save a new Cart object
             var cart = new Cart
             {
@@ -72,7 +76,7 @@ namespace COMP2084BeerStore.Controllers
                 Quantity = Quantity,
                 Price = price,
                 DateCreated = currentDateTime,
-                CustomerId = "Test" // we will make this dynamic next
+                CustomerId = CustomerId
             };
 
             _context.Carts.Add(cart);
@@ -82,10 +86,53 @@ namespace COMP2084BeerStore.Controllers
             return RedirectToAction("Cart");
         }
 
+        private string GetCustomerId()
+        {
+            // check the session for an existing CustomerId
+            if (HttpContext.Session.GetString("CustomerId") == null) {
+                // if we don't already have an existing CustomerId in the session, check if customer is logged in
+                var CustomerId = "";
+
+                // if customer is logged in, use their email as the CustomerId
+                if (User.Identity.IsAuthenticated)
+                {
+                    CustomerId = User.Identity.Name;
+                }
+                // if the customer is anonymous, use Guid to create a new identifier
+                else
+                {
+                    CustomerId = Guid.NewGuid().ToString();
+                } 
+
+                // now store the CustomerId in a session variable
+                HttpContext.Session.SetString("CustomerId", CustomerId);
+            }
+
+            // return the Session variable
+            return HttpContext.Session.GetString("CustomerId");
+        }
+
         // /Store/Cart
         public IActionResult Cart()
         {
-            return View();
+            // fetch current cart for display
+            var CustomerId = "";
+
+            // in case user comes to cart page before adding anything, identify them first
+            if (HttpContext.Session.GetString("CustomerId") == null)
+            {
+                CustomerId = GetCustomerId();
+            }
+            else
+            {
+                CustomerId = HttpContext.Session.GetString("CustomerId");
+            }
+
+            // query the db for this customer
+            var cartItems = _context.Carts.Where(c => c.CustomerId == CustomerId).ToList();
+
+            // pass the data to the view for display
+            return View(cartItems);
         }
     }
 }
