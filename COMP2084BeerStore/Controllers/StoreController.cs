@@ -54,5 +54,38 @@ namespace COMP2084BeerStore.Controllers
             // load a form to capture a new category object from the user
             return View();
         }
+
+        // /Store/AddToCart
+        [HttpPost]
+        public IActionResult AddToCart(int ProductId, int Quantity)
+        {
+            // query the db for the product price
+            var price = _context.Products.Find(ProductId).Price;
+
+            // get current Date & Time using built in .net function
+            var currentDateTime = DateTime.Now;
+
+            // create and save a new Cart object
+            var cart = new Cart
+            {
+                ProductId = ProductId,
+                Quantity = Quantity,
+                Price = price,
+                DateCreated = currentDateTime,
+                CustomerId = "Test" // we will make this dynamic next
+            };
+
+            _context.Carts.Add(cart);
+            _context.SaveChanges();
+
+            // redirect to the Cart view
+            return RedirectToAction("Cart");
+        }
+
+        // /Store/Cart
+        public IActionResult Cart()
+        {
+            return View();
+        }
     }
 }

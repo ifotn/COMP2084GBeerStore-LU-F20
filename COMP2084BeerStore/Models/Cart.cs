@@ -12,6 +12,7 @@ namespace COMP2084BeerStore.Models
         public string CustomerId { get; set; }
         public int Quantity { get; set; }
         public DateTime DateCreated { get; set; }
+        public double Price { get; set; }
 
         // parent object ref
         public Product Product { get; set; }
