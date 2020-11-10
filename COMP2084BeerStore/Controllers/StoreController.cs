@@ -9,17 +9,24 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+// stripe payment references
+using Stripe;
+using System.Configuration;  // this is to read the Stripe API keys from appsettings.json
+using Microsoft.Extensions.Configuration;
+
 namespace COMP2084BeerStore.Controllers
 {
     public class StoreController : Controller
     {
         // db connection
         private readonly ApplicationDbContext _context;
+        IConfiguration _iconfiguration;
 
         // constructor that instantiates an instance of our db connection
-        public StoreController(ApplicationDbContext context)
+        public StoreController(ApplicationDbContext context, IConfiguration iconfiguration)
         {
             _context = context;
+            _iconfiguration = iconfiguration;
         }
 
         public IActionResult Index()
@@ -148,7 +155,7 @@ namespace COMP2084BeerStore.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Checkout([Bind("Address,City,Province,PostalCode")] Order order)
+        public IActionResult Checkout([Bind("Address,City,Province,PostalCode")] Models.Order order)
         {
             // populate the 3 automatic order properties
             order.OrderDate = DateTime.Now;
@@ -162,9 +169,47 @@ namespace COMP2084BeerStore.Controllers
             order.Total = orderTotal;
 
             // use SessionsExtension object to store the order object in a session variable
+            HttpContext.Session.SetObject("Order", order);
 
             // redirect to payment page
             return RedirectToAction("Payment");
+        }
+
+        // GET: /Cart/Payment
+        [Authorize]
+        public IActionResult Payment()
+        {
+            var order = HttpContext.Session.GetObject<Models.Order>("Order");
+            // stripe charge amount must be in cents, not dollars
+            ViewBag.Total = order.Total * 100;  
+
+            // use iconfiguration to read key from appsettings
+            ViewBag.PublishableKey = _iconfiguration["Stripe:PublishableKey"]; 
+
+            return View();
+        }
+
+        // POST: /Cart/Payment
+        [Authorize]
+        public IActionResult Payment(string stripeToken)
+        {
+            // 1. create Stripe customer
+            //StripeConfiguration.ApiKey = _iconfiguration["Stripe:SecretKey"];
+            //Stripe.Customer customer = Stripe.Customer
+            //{
+            //    Source = stripeToken,
+            //    Email = User.Identity.Name
+            //});
+
+            // 2. create Stripe charge
+
+            // 3. save a new order to our db
+
+            // 4. save the cart items as new OrderDetails to our db
+
+            // 5. delete the cart items from this order 
+
+            // 6. load an order confirmation page
         }
 
     }

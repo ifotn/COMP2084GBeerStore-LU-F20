@@ -45,6 +45,9 @@ namespace COMP2084BeerStore
             // enable Session support to store user identities for the shopping cart
             services.AddSession();
 
+            // add configuration support for the StoreController
+            services.AddSingleton<IConfiguration>(Configuration);
+
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
