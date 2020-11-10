@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using COMP2084BeerStore.Data;
 using COMP2084BeerStore.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace COMP2084BeerStore.Controllers
 {
@@ -129,10 +131,41 @@ namespace COMP2084BeerStore.Controllers
             }
 
             // query the db for this customer
-            var cartItems = _context.Carts.Where(c => c.CustomerId == CustomerId).ToList();
+            var cartItems = _context.Carts.Include(c => c.Product).Where(c => c.CustomerId == CustomerId).ToList();
 
             // pass the data to the view for display
             return View(cartItems);
         }
+
+        [Authorize]
+        // GET: /Store/Checkout
+        public IActionResult Checkout()
+        {
+            return View();
+        }
+
+        // POST: /Store/Checkout
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Checkout([Bind("Address,City,Province,PostalCode")] Order order)
+        {
+            // populate the 3 automatic order properties
+            order.OrderDate = DateTime.Now;
+            order.CustomerId = User.Identity.Name;
+
+            // calc order total based on the current cart
+            var cartCustomer = HttpContext.Session.GetString("CustomerId");
+            var cartItems = _context.Carts.Where(c => c.CustomerId == cartCustomer);
+            var orderTotal = (from c in cartItems
+                              select c.Quantity * c.Price).Sum();
+            order.Total = orderTotal;
+
+            // use SessionsExtension object to store the order object in a session variable
+
+            // redirect to payment page
+            return RedirectToAction("Payment");
+        }
+
     }
 }
