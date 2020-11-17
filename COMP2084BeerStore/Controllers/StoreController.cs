@@ -191,25 +191,64 @@ namespace COMP2084BeerStore.Controllers
 
         // POST: /Cart/Payment
         [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Payment(string stripeToken)
         {
+            // retriever order from session
+            var order = HttpContext.Session.GetObject<Models.Order>("Order");
+
             // 1. create Stripe customer
-            //StripeConfiguration.ApiKey = _iconfiguration["Stripe:SecretKey"];
-            //Stripe.Customer customer = Stripe.Customer
-            //{
-            //    Source = stripeToken,
-            //    Email = User.Identity.Name
-            //});
+            var customerService = new Stripe.CustomerService();
+            var charges = new Stripe.ChargeService();
+
+            StripeConfiguration.ApiKey = _iconfiguration["Stripe:SecretKey"];
+            Stripe.Customer customer = customerService.Create(new Stripe.CustomerCreateOptions
+            {
+                Source = stripeToken,
+                Email = User.Identity.Name
+            });
 
             // 2. create Stripe charge
+            var charge = charges.Create(new Stripe.ChargeCreateOptions
+            {
+                Amount = Convert.ToInt32(order.Total * 100),
+                Description = "COMP2084 Beer Store Purchase",
+                Currency = "cad",
+                Customer = customer.Id
+            });
 
             // 3. save a new order to our db
+            _context.Orders.Add(order);
+            _context.SaveChanges();
 
             // 4. save the cart items as new OrderDetails to our db
+            var cartItems = _context.Carts.Where(c => c.CustomerId == HttpContext.Session.GetString("CartUsername"));
+            foreach (var item in cartItems)
+            {
+                var orderDetail = new OrderDetail
+                {
+                    OrderId = order.Id,
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity,
+                    Cost = item.Price
+                };
+
+                _context.OrderDetails.Add(orderDetail);
+            }
+
+            _context.SaveChanges();
 
             // 5. delete the cart items from this order 
+            foreach (var item in cartItems)
+            {
+                _context.Carts.Remove(item);
+            }
+
+            _context.SaveChanges();
 
             // 6. load an order confirmation page
+            return RedirectToAction("Details", "Orders", new { @id = order.Id });
         }
 
     }
