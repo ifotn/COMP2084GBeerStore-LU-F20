@@ -27,7 +27,7 @@ namespace COMP2084BeerStore.Controllers
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Products.Include(p => p.Category).OrderBy(p => p.ProductName);
-            return View(await applicationDbContext.ToListAsync());
+            return View("Index", await applicationDbContext.ToListAsync());
         }
 
         [AllowAnonymous]
