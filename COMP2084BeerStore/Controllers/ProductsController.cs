@@ -36,7 +36,7 @@ namespace COMP2084BeerStore.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return View("Error");
             }
 
             var product = await _context.Products
@@ -47,15 +47,16 @@ namespace COMP2084BeerStore.Controllers
                 return NotFound();
             }
 
-            return View(product);
+            return View("Details", product);
         }
 
         // GET: Products/Create
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Categories.OrderBy(c => c.Name), "Id", "Name");
-            return View();
+            return View("Create");
         }
+
 
         // POST: Products/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
@@ -93,7 +94,7 @@ namespace COMP2084BeerStore.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-            return View(product);
+            return View("Create", product);
         }
 
         // GET: Products/Edit/5
@@ -101,16 +102,16 @@ namespace COMP2084BeerStore.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return View("Error");
             }
 
             var product = await _context.Products.FindAsync(id);
             if (product == null)
             {
-                return NotFound();
+                return View("Error");
             }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-            return View(product);
+            return View("Edit", product);
         }
 
         // POST: Products/Edit/5
@@ -122,7 +123,7 @@ namespace COMP2084BeerStore.Controllers
         {
             if (id != product.Id)
             {
-                return NotFound();
+                return View("Error");
             }
 
             if (ModelState.IsValid)
@@ -136,7 +137,7 @@ namespace COMP2084BeerStore.Controllers
                 {
                     if (!ProductExists(product.Id))
                     {
-                        return NotFound();
+                        return View("Error");
                     }
                     else
                     {
@@ -146,7 +147,7 @@ namespace COMP2084BeerStore.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-            return View(product);
+            return View("Edit", product);
         }
 
         // GET: Products/Delete/5
@@ -154,7 +155,8 @@ namespace COMP2084BeerStore.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                //return NotFound();
+                return View("Error");
             }
 
             var product = await _context.Products
@@ -162,10 +164,11 @@ namespace COMP2084BeerStore.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {
-                return NotFound();
+                //return NotFound();
+                return View("Error");
             }
 
-            return View(product);
+            return View("Delete", product);
         }
 
         // POST: Products/Delete/5
